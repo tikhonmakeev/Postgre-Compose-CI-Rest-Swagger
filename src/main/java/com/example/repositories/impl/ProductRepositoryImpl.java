@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -14,38 +15,44 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    public void createProduct(String name, String description, float price, String category) {
-
-    }
 
     @Override
-    public void updateProduct(int id, String newName, String newDescription, float newPrice, String newCategory) {
-
-    }
-
-    @Override
-    public void deleteProduct(int id) {
-
-    }
-
-    @Override
-    public Product getProductById(int id) {
-        return null;
-    }
-
-    @Override
-    public List<Product> getAllProducts() {
+    public List<Product> findByCategory(String category) {
         return List.of();
     }
 
     @Override
-    public List<Product> getProductsByCategory(String category) {
+    public List<Product> findByPriceBetween(float minPrice, float maxPrice) {
         return List.of();
     }
 
     @Override
-    public List<Product> getProductsByPriceRange(float minPrice, float maxPrice) {
+    public boolean existsById(long id) {
+        return false;
+    }
+
+    @Override
+    public Optional<Product> findById(long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Product> findAll() {
         return List.of();
+    }
+
+    @Override
+    public long save(Product entity) {
+        return 0;
+    }
+
+    @Override
+    public void update(Product entity) {
+
+    }
+
+    @Override
+    public void deleteById(long id) {
+
     }
 }

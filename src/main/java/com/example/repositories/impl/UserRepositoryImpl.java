@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -37,5 +38,35 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAllUsers() {
         return List.of();
+    }
+
+    @Override
+    public boolean existsById(long id) {
+        return false;
+    }
+
+    @Override
+    public Optional<User> findById(long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<User> findAll() {
+        return List.of();
+    }
+
+    @Override
+    public long save(User entity) {
+        return 0;
+    }
+
+    @Override
+    public void update(User entity) {
+
+    }
+
+    @Override
+    public void deleteById(long id) {
+
     }
 }
