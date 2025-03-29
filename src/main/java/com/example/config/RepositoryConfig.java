@@ -4,6 +4,8 @@ import com.example.repositories.OrderItemRepository;
 import com.example.repositories.OrderRepository;
 import com.example.repositories.ProductRepository;
 import com.example.repositories.UserRepository;
+import com.example.repositories.impl.OrderItemRepositoryImpl;
+import com.example.repositories.impl.OrderRepositoryImpl;
 import com.example.repositories.impl.ProductRepositoryImpl;
 import com.example.repositories.impl.UserRepositoryImpl;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +27,11 @@ public class RepositoryConfig {
 
     @Bean
     public OrderRepository orderRepository(JdbcTemplate jdbcTemplate) {
-        return new ProductRepositoryImpl(jdbcTemplate);
+        return new OrderRepositoryImpl(jdbcTemplate);
     }
 
     @Bean
-    public OrderItemRepository orderItemRepositoryx(JdbcTemplate jdbcTemplate) {
-        return new ProductRepositoryImpl(jdbcTemplate);
+    public OrderItemRepository orderItemRepository(JdbcTemplate jdbcTemplate) {
+        return new OrderItemRepositoryImpl(jdbcTemplate);
     }
 }
