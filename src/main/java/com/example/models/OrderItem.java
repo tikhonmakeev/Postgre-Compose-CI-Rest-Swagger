@@ -1,7 +1,7 @@
 package com.example.models;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +17,8 @@ public class OrderItem {
     private long orderId;
     @NotNull
     private long productId;
-    @NotBlank
+    @Positive
     private int quantity;
-    @NotBlank
+    @Positive
     private float price;
 }
