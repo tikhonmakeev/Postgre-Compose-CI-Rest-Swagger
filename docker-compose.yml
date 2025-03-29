@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14  # Используем официальный образ PostgreSQL версии 14
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: myuser       # Имя пользователя для базы данных
+      POSTGRES_PASSWORD: mypassword  # Пароль пользователя
+      POSTGRES_DB: mydatabase     # Название базы данных
+    ports:
+      - "5432:5432"  # Проброс порта для доступа к PostgreSQL локально
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Храним данные PostgreSQL в volume
+
+  pgadmin:
+    image: dpage/pgadmin4  # Используем официальный образ PgAdmin
+    container_name: pgadmin_container
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com  # Email для входа в PgAdmin
+      PGADMIN_DEFAULT_PASSWORD: adminpassword   # Пароль для входа в PgAdmin
+    ports:
+      - "5050:80"  # Проброс порта для доступа к PgAdmin локально
+    depends_on:
+      - postgres  # PgAdmin будет запускаться только после того, как запустится PostgreSQL
+
+  app:  # сервис для приложения
+    build: .
+    container_name: app_container
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: mypassword
+
+volumes:
+  postgres_data:  # Объявляем volume для хранения данных PostgreSQL
