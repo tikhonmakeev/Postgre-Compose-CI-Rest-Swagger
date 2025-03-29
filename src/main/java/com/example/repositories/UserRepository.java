@@ -1,18 +1,14 @@
 package com.example.repositories;
 
-import com.example.models.Product;
 import com.example.models.User;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User> {
-    void createUser(String name, String email, String address, String phone);
-
-    void updateUser(int id, String newName, String newEmail, String newAddress, String newPhone);
-
-    void deleteUser(int id);
-
-    User getUserById(int id);
-
-    List<User> getAllUsers();
+    long save(User user);
+    Optional<User> findById(Long id);
+    Optional<User> findByEmail(String email);
+    boolean existsById(Long id);
+    boolean existsByEmail(String email);
+    void deleteById(Long id);
 }
