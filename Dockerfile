@@ -1,9 +1,9 @@
-FROM eclipse-temurin:17-jdk-jammy as builder
+FROM gradle:8.12.1-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN ./gradlew build --no-daemon
+RUN gradle build --no-daemon
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 CMD ["java", "-jar", "app.jar"]
