@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -15,27 +16,42 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addItemToOrder(int orderId, int productId, int quantity, float price) {
+    public void addItemsToOrder(Long orderId, List<OrderItem> items) {
 
     }
 
     @Override
-    public void updateOrderItemQuantity(int orderItemId, int newQuantity) {
-
-    }
-
-    @Override
-    public void removeItemFromOrder(int orderItemId) {
-
-    }
-
-    @Override
-    public OrderItem getOrderItemById(int orderItemId) {
-        return null;
-    }
-
-    @Override
-    public List<OrderItem> getItemsForOrder(int orderId) {
+    public List<OrderItem> findByOrderId(Long orderId) {
         return List.of();
+    }
+
+    @Override
+    public boolean existsById(long id) {
+        return false;
+    }
+
+    @Override
+    public Optional<OrderItem> findById(long id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<OrderItem> findAll() {
+        return List.of();
+    }
+
+    @Override
+    public long save(OrderItem entity) {
+        return 0;
+    }
+
+    @Override
+    public void update(OrderItem entity) {
+
+    }
+
+    @Override
+    public void deleteById(long id) {
+
     }
 }
