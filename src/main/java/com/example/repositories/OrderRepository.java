@@ -1,19 +1,11 @@
 package com.example.repositories;
 
 import com.example.models.Order;
+import com.example.models.Product;
 
 import java.util.List;
 
-public interface OrderRepository {
-    void createOrder(int userId, String orderDate, String status);
-
-    void updateOrderStatus(int orderId, String newStatus);
-
-    void deleteOrder(int orderId);
-
-    Order getOrderById(int orderId);
-
-    List<Order> getOrdersByUserId(int userId);
-
-    List<Order> getOrdersByStatus(String status);
+public interface OrderRepository extends CrudRepository<Order>  {
+    void updateStatus(Long orderId, String status);
+    List<Order> findByUserId(Long userId);
 }

@@ -1,10 +1,11 @@
 package com.example.repositories;
 
+import com.example.models.Product;
 import com.example.models.User;
 
 import java.util.List;
 
-public interface UserRepository {
+public interface UserRepository extends CrudRepository<User> {
     void createUser(String name, String email, String address, String phone);
 
     void updateUser(int id, String newName, String newEmail, String newAddress, String newPhone);
