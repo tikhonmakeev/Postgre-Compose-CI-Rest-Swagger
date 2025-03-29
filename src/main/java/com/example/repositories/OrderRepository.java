@@ -1,4 +1,4 @@
-package repositories;
+package com.example.repositories;
 
 public interface OrderRepository {
 }
