@@ -1,7 +1,6 @@
 package com.example.repositories;
 
 import com.example.models.Order;
-import com.example.models.Product;
 
 import java.util.List;
 
