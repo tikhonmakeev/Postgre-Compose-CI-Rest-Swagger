@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,8 +16,8 @@ public class Order {
     private long id;
     @NotNull
     private long userId;
+    @NotNull
+    private LocalDateTime orderDate;
     @NotBlank
-    private String order_date;
-    @NotBlank
-    private OrderStatus status;
+    private String status;
 }
