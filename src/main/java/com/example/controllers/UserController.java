@@ -91,7 +91,7 @@ public class UserController {
         response.setEmail(user.getEmail());
         response.setAddress(user.getAddress());
         response.setPhone(user.getPhone());
-        response.setCreatedAt(LocalDateTime.now()); // In a real app, this would come from the database
+        response.setCreatedAt(LocalDateTime.now());
         return response;
     }
 }
