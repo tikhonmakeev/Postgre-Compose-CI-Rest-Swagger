@@ -3,9 +3,9 @@ package com.example.controllers;
 import com.example.models.Product;
 import com.example.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -24,7 +24,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getProducts() {
-
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
