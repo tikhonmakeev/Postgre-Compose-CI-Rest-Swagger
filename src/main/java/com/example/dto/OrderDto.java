@@ -1,25 +1,21 @@
-package com.example.models;
+package com.example.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.example.models.OrderStatus;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class Order {
+@RequiredArgsConstructor
+public class OrderDto {
 
     @NotNull
     private long id;
-    @NotNull
     private long userId;
-    @NotNull
     private LocalDateTime orderDate;
-    @NotBlank
     private OrderStatus status;
 }

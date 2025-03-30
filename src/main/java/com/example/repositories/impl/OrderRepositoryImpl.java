@@ -1,6 +1,7 @@
 package com.example.repositories.impl;
 
 import com.example.models.Order;
+import com.example.models.OrderStatus;
 import com.example.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +27,13 @@ public class OrderRepositoryImpl implements OrderRepository {
             rs.getLong("id"),
             rs.getLong("user_id"),
             rs.getTimestamp("order_date").toLocalDateTime(),
-            rs.getString("status")
+            OrderStatus.valueOf(rs.getString("status"))
     );
 
     @Override
-    public void updateStatus(Long orderId, String status) {
+    public void updateStatus(Long orderId, OrderStatus status) {
         String sql = "UPDATE orders SET status = ? WHERE id = ?";
-        jdbcTemplate.update(sql, status, orderId);
+        jdbcTemplate.update(sql, status.name(), orderId);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, entity.getUserId());
             ps.setTimestamp(2, Timestamp.valueOf(entity.getOrderDate()));
-            ps.setString(3, entity.getStatus());
+            ps.setString(3, entity.getStatus().name());
             return ps;
         }, keyHolder);
 
