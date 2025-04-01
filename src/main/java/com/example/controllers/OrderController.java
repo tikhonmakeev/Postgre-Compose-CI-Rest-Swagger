@@ -1,29 +1,50 @@
 package com.example.controllers;
 
-import com.example.models.Product;
+import com.example.dto.orderItem.OrderItemRequest;
+import com.example.models.Order;
+import com.example.models.OrderStatus;
 import com.example.services.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
-    @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Product>> getOrders() {
-
+    @PostMapping
+    public ResponseEntity<Order> createOrder(
+            @RequestParam Long userId,
+            @RequestBody List<OrderItemRequest> items) {
+        Order order = orderService.createOrder(userId, items);
+        return ResponseEntity.ok(order);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+        Order order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getUserOrders(
+            @PathVariable Long userId) {
+        List<Order> orders = orderService.getUserOrders(userId);
+        return ResponseEntity.ok(orders);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Order> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status) {
+        Order order = orderService.updateOrderStatus(id, status);
+        return ResponseEntity.ok(order);
+    }
 }
