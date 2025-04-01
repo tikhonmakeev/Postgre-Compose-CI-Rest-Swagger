@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class Product {
     @NotBlank
     private String description;
     @NotNull
-    private float price;
+    private BigDecimal price;
     @NotBlank
     private String category;
 }

@@ -26,7 +26,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
             rs.getLong("order_id"),
             rs.getLong("product_id"),
             rs.getInt("quantity"),
-            rs.getFloat("price")
+            rs.getBigDecimal("price")
     );
 
     @Override
@@ -83,7 +83,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
             ps.setLong(1, entity.getOrderId());
             ps.setLong(2, entity.getProductId());
             ps.setInt(3, entity.getQuantity());
-            ps.setFloat(4, entity.getPrice());
+            ps.setBigDecimal(4, entity.getPrice());
             return ps;
         }, keyHolder);
 

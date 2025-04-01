@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,5 +22,5 @@ public class OrderItem {
     @Positive
     private int quantity;
     @Positive
-    private float price;
+    private BigDecimal price;
 }

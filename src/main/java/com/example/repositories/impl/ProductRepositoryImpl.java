@@ -25,7 +25,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             rs.getLong("id"),
             rs.getString("name"),
             rs.getString("description"),
-            rs.getFloat("price"),
+            rs.getBigDecimal("price"),
             rs.getString("category")
     );
 
@@ -74,7 +74,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getDescription());
-            ps.setFloat(3, entity.getPrice());
+            ps.setBigDecimal(3, entity.getPrice());
             ps.setString(4, entity.getCategory());
             return ps;
         }, keyHolder);
