@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ class ProductRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product(1L, "Test Product", "Description", "Electronics", 666.666);
+        product = new Product(1L, "Test Product", "Description", 666.666f, "Electronics");
     }
 
     @Test
@@ -101,15 +102,14 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void save() {
-        KeyHolder keyHolder = mock(GeneratedKeyHolder.class);
-        when(keyHolder.getKey()).thenReturn(1L);
+    void save_ShouldReturnGeneratedId() {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
         doAnswer(invocation -> {
-            ((GeneratedKeyHolder) invocation.getArgument(1)).getKeyList().add(java.util.Collections.singletonMap("", 1L));
+            KeyHolder kh = invocation.getArgument(1);
+            kh.getKeyList().add(Collections.singletonMap("id", 1L));
             return 1;
         }).when(jdbcTemplate).update(any(), any(KeyHolder.class));
-
         long id = productRepository.save(product);
 
         assertEquals(1L, id);
@@ -121,11 +121,11 @@ class ProductRepositoryTest {
         productRepository.update(product);
 
         verify(jdbcTemplate).update(
-                eq("UPDATE products SET name = ?, description = ?, category = ?, price = ? WHERE id = ?"),
+                eq("UPDATE products SET name = ?, description = ?, price = ?, category = ? WHERE id = ?"),
                 eq(product.getName()),
                 eq(product.getDescription()),
-                eq(product.getCategory()),
                 eq(product.getPrice()),
+                eq(product.getCategory()),
                 eq(product.getId())
         );
     }

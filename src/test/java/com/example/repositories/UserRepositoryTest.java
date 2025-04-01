@@ -15,6 +15,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,7 +110,6 @@ class UserRepositoryTest {
         assertEquals(user, result.get());
         verify(jdbcTemplate).queryForObject(eq("SELECT * FROM users WHERE email = ?"), any(RowMapper.class), eq("test@test.com"));
     }
-
     @Test
     void findByEmail_NotFound() {
         when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), eq("test@test.com")))
@@ -133,12 +133,12 @@ class UserRepositoryTest {
     }
 
     @Test
-    void save() {
-        KeyHolder keyHolder = mock(GeneratedKeyHolder.class);
-        when(keyHolder.getKey()).thenReturn(1L);
+    void save_ShouldReturnGeneratedId() {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
         doAnswer(invocation -> {
-            ((GeneratedKeyHolder) invocation.getArgument(1)).getKeyList().add(java.util.Collections.singletonMap("", 1L));
+            KeyHolder kh = invocation.getArgument(1);
+            kh.getKeyList().add(Collections.singletonMap("id", 1L));
             return 1;
         }).when(jdbcTemplate).update(any(), any(KeyHolder.class));
 
