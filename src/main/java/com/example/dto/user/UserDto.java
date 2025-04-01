@@ -1,23 +1,18 @@
-package com.example.models;
+package com.example.dto.user;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class User {
+public class UserDto {
 
     @NotNull
     private long id;
-    @NotBlank
     private String name;
-    @NotBlank
     private String email;
     private String address;
     private String phone;

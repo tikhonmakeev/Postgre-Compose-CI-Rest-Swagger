@@ -29,6 +29,28 @@ public class UserRepositoryImpl implements UserRepository {
             rs.getString("phone")
     );
 
+    public void createUser(String name, String email, String address, String phone) {
+        User user = new User(0, name, email, address, phone);
+        save(user);
+    }
+
+    public void updateUser(long id, String newName, String newEmail, String newAddress, String newPhone) {
+        User user = new User(id, newName, newEmail, newAddress, newPhone);
+        update(user);
+    }
+
+    public void deleteUser(long id) {
+        deleteById(id);
+    }
+
+    public User getUserById(long id) {
+        return findById(id).orElse(null);
+    }
+
+    public List<User> getAllUsers() {
+        return findAll();
+    }
+
     @Override
     public boolean existsById(long id) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
@@ -71,6 +93,25 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        try {
+            String sql = "SELECT * FROM users WHERE email = ?";
+            User user = jdbcTemplate.queryForObject(sql, userRowMapper, email);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+
+    @Override
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
+    }
+
+    @Override
     public void update(User entity) {
         String sql = "UPDATE users SET name = ?, email = ?, address = ?, phone = ? WHERE id = ?";
         jdbcTemplate.update(sql,
@@ -85,22 +126,5 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteById(long id) {
         String sql = "DELETE FROM users WHERE id = ?";
         jdbcTemplate.update(sql, id);
-    }
-
-    @Override
-    public Optional<User> findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, email));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
-        return count != null && count > 0;
     }
 }
