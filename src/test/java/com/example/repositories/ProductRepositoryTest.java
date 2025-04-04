@@ -110,7 +110,6 @@ class ProductRepositoryTest {
             kh.getKeyList().add(Collections.singletonMap("id", 1L));
             return 1;
         }).when(jdbcTemplate).update(any(), any(KeyHolder.class));
-
         long id = productRepository.save(product);
 
         assertEquals(1L, id);
