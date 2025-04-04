@@ -29,29 +29,24 @@ public class UserRepositoryImpl implements UserRepository {
             rs.getString("phone")
     );
 
-    @Override
     public void createUser(String name, String email, String address, String phone) {
         User user = new User(0, name, email, address, phone);
         save(user);
     }
 
-    @Override
-    public void updateUser(int id, String newName, String newEmail, String newAddress, String newPhone) {
+    public void updateUser(long id, String newName, String newEmail, String newAddress, String newPhone) {
         User user = new User(id, newName, newEmail, newAddress, newPhone);
         update(user);
     }
 
-    @Override
-    public void deleteUser(int id) {
+    public void deleteUser(long id) {
         deleteById(id);
     }
 
-    @Override
-    public User getUserById(int id) {
+    public User getUserById(long id) {
         return findById(id).orElse(null);
     }
 
-    @Override
     public List<User> getAllUsers() {
         return findAll();
     }
@@ -95,6 +90,25 @@ public class UserRepositoryImpl implements UserRepository {
         }, keyHolder);
 
         return keyHolder.getKey().longValue();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        try {
+            String sql = "SELECT * FROM users WHERE email = ?";
+            User user = jdbcTemplate.queryForObject(sql, userRowMapper, email);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+
+    @Override
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
     }
 
     @Override
