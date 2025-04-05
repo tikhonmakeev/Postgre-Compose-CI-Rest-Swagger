@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -110,6 +109,7 @@ class UserRepositoryTest {
         assertEquals(user, result.get());
         verify(jdbcTemplate).queryForObject(eq("SELECT * FROM users WHERE email = ?"), any(RowMapper.class), eq("test@test.com"));
     }
+
     @Test
     void findByEmail_NotFound() {
         when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), eq("test@test.com")))

@@ -13,6 +13,13 @@ services:
       - "5432:5432"  # Проброс порта для доступа к PostgreSQL локально
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Храним данные PostgreSQL в volume
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
+      interval: 5s
+      retries: 10
+      start_period: 10s
+
 
   pgadmin:
     image: dpage/pgadmin4  # Используем официальный образ PgAdmin
@@ -33,11 +40,24 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_container:5432/mydatabase
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
+
+  test:
+    build:
+      context: .
+      target: build
+    container_name: gradle_test_runner
+    entrypoint: ["gradle", "test", "--no-daemon"]
+    environment:
+      GRADLE_OPTS: "--add-opens java.base/java.lang=ALL-UNNAMED"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:  # Объявляем volume для хранения данных PostgreSQL

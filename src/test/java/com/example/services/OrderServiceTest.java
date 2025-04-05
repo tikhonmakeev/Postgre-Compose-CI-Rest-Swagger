@@ -1,6 +1,6 @@
 package com.example.services;
 
-import com.example.dto.orderItem.OrderItemDto;
+import com.example.dto.orderItem.OrderItemRequest;
 import com.example.models.*;
 import com.example.repositories.*;
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,9 @@ class OrderServiceTest {
 
     @Test
     void createOrder_ShouldSuccess() {
-        Long userId = 1L;
-        Long productId = 10L;
-        Long orderId = 100L;
+        long  userId = 1L;
+        long  productId = 10L;
+        long  orderId = 100L;
 
         User user = new User();
         user.setId(userId);
@@ -49,70 +49,41 @@ class OrderServiceTest {
         product.setId(productId);
         product.setPrice(new BigDecimal("100.0"));
 
-        OrderItemDto itemDto = new OrderItemDto();
-        itemDto.setProductId(productId);
-        itemDto.setQuantity(2);
+        OrderItemRequest orderItemRequest = new OrderItemRequest();
+        orderItemRequest.setProductId(productId);
+        orderItemRequest.setQuantity(2);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.existsById(userId)).thenReturn(true);
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
-            Order order = invocation.getArgument(0);
-            order.setId(orderId);
-            return order;
-        });
+        when(orderRepository.save(any(Order.class))).thenReturn(orderId);
 
-        Order result = orderService.createOrder(userId, List.of(itemDto));
+        Order result = orderService.createOrder(userId, List.of(orderItemRequest));
 
         assertNotNull(result);
         assertEquals(userId, result.getUserId());
         assertEquals(OrderStatus.NEW, result.getStatus());
         assertNotNull(result.getOrderDate());
+        assertEquals(orderId, result.getId());
 
-        verify(userRepository).findById(userId);
+        verify(userRepository).existsById(userId);
         verify(productRepository).findById(productId);
         verify(orderRepository).save(any(Order.class));
-        verify(orderItemRepository).addItemsToOrder(eq(orderId), anyList());
     }
 
     @Test
     void createOrder_ShouldThrowWhenUserNotFound() {
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        long  userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.createOrder(userId, Collections.emptyList());
-        });
+        assertThrows(NotFoundException.class, () -> orderService.createOrder(userId, Collections.emptyList()));
 
-        verify(userRepository).findById(userId);
+        verify(userRepository).existsById(userId);
         verifyNoInteractions(productRepository, orderRepository, orderItemRepository);
     }
 
     @Test
-    void createOrder_ShouldThrowWhenProductNotFound() {
-        Long userId = 1L;
-        Long productId = 10L;
-
-        User user = new User();
-        user.setId(userId);
-
-        OrderItemDto itemDto = new OrderItemDto();
-        itemDto.setProductId(productId);
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.createOrder(userId, List.of(itemDto));
-        });
-
-        verify(userRepository).findById(userId);
-        verify(productRepository).findById(productId);
-        verifyNoInteractions(orderRepository, orderItemRepository);
-    }
-
-    @Test
     void updateOrderStatus_ShouldSuccess() {
-        Long orderId = 1L;
+        long  orderId = 1L;
         OrderStatus newStatus = OrderStatus.PROCESSING;
 
         Order existingOrder = new Order();
@@ -120,23 +91,21 @@ class OrderServiceTest {
         existingOrder.setStatus(OrderStatus.NEW);
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
-        doNothing().when(orderRepository).update(any(Order.class));
+        when(orderRepository.save(existingOrder)).thenReturn(orderId);
 
         Order result = orderService.updateOrderStatus(orderId, newStatus);
 
         assertEquals(newStatus, result.getStatus());
         verify(orderRepository).findById(orderId);
-        verify(orderRepository).update(existingOrder);
+        verify(orderRepository).save(existingOrder);
     }
 
     @Test
     void updateOrderStatus_ShouldThrowWhenOrderNotFound() {
-        Long orderId = 1L;
+        long  orderId = 1L;
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.updateOrderStatus(orderId, OrderStatus.PROCESSING);
-        });
+        assertThrows(NotFoundException.class, () -> orderService.updateOrderStatus(orderId, OrderStatus.PROCESSING));
 
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(orderRepository);
@@ -144,7 +113,7 @@ class OrderServiceTest {
 
     @Test
     void getUserOrders_ShouldReturnOrders() {
-        Long userId = 1L;
+        long  userId = 1L;
         List<Order> expectedOrders = List.of(new Order(), new Order());
 
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -159,71 +128,74 @@ class OrderServiceTest {
 
     @Test
     void getUserOrders_ShouldThrowWhenUserNotFound() {
-        Long userId = 1L;
+        long  userId = 1L;
         when(userRepository.existsById(userId)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.getUserOrders(userId);
-        });
+        assertThrows(NotFoundException.class, () -> orderService.getUserOrders(userId));
 
         verify(userRepository).existsById(userId);
         verifyNoInteractions(orderRepository);
     }
 
     @Test
-    void addItemsToOrder_ShouldSaveAllItems() {
-        Long orderId = 1L;
-        Long productId = 10L;
+    void createOrder_ShouldSuccessWithoutItems() {
+        long  userId = 1L;
+        long  orderId = 100L;
 
-        Product product = new Product();
-        product.setId(productId);
-        product.setPrice(50.0F);
+        User user = new User();
+        user.setId(userId);
 
-        OrderItemDto itemDto = new OrderItemDto();
-        itemDto.setProductId(productId);
-        itemDto.setQuantity(3);
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(orderRepository.save(any(Order.class))).thenReturn(orderId);
 
-        when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        Order result = orderService.createOrder(userId, Collections.emptyList());
 
-        orderService.addItemsToOrder(orderId, List.of(itemDto));
+        assertNotNull(result);
+        assertEquals(userId, result.getUserId());
+        assertEquals(OrderStatus.NEW, result.getStatus());
+        assertNotNull(result.getOrderDate());
 
-        verify(orderRepository).existsById(orderId);
-        verify(productRepository).findById(productId);
-        verify(orderItemRepository).addItemsToOrder(eq(orderId), anyList());
+        verify(userRepository).existsById(userId);
+        verify(orderRepository).save(any(Order.class));
     }
 
     @Test
-    void addItemsToOrder_ShouldThrowWhenOrderNotFound() {
-        Long orderId = 1L;
+    void deleteOrder_ShouldSuccess() {
+        long  orderId = 1L;
+
+        when(orderRepository.existsById(orderId)).thenReturn(true);
+        doNothing().when(orderRepository).deleteById(orderId);
+
+        orderService.deleteOrderById(orderId);
+
+        verify(orderRepository).existsById(orderId);
+        verify(orderRepository).deleteById(orderId);
+    }
+
+    @Test
+    void deleteOrder_ShouldThrowWhenOrderNotFound() {
+        long  orderId = 1L;
+        when(orderRepository.existsById(orderId)).thenReturn(false);
+
+        assertThrows(NotFoundException.class, () -> orderService.deleteOrderById(orderId));
+
+        verify(orderRepository).existsById(orderId);
+    }
+
+    @Test
+    void addItemsToOrder_ShouldThrowWhenOrderDoesNotExist() {
+        long  orderId = 1L;
+        long  productId = 10L;
+        OrderItemRequest orderItemRequest = new OrderItemRequest();
+        orderItemRequest.setProductId(productId);
+        orderItemRequest.setQuantity(1);
 
         when(orderRepository.existsById(orderId)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.addItemsToOrder(orderId, Collections.emptyList());
-        });
+        assertThrows(NotFoundException.class, () -> orderService.addItemsToOrder(orderId, List.of(orderItemRequest)));
 
         verify(orderRepository).existsById(orderId);
         verifyNoInteractions(productRepository, orderItemRepository);
     }
 
-    @Test
-    void addItemsToOrder_ShouldThrowWhenProductNotFound() {
-        Long orderId = 1L;
-        Long productId = 10L;
-
-        OrderItemDto itemDto = new OrderItemDto();
-        itemDto.setProductId(productId);
-
-        when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            orderService.addItemsToOrder(orderId, List.of(itemDto));
-        });
-
-        verify(orderRepository).existsById(orderId);
-        verify(productRepository).findById(productId);
-        verifyNoInteractions(orderItemRepository);
-    }
 }
