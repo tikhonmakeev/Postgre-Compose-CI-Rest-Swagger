@@ -50,7 +50,7 @@ public class UserController {
         User user = new User(0, userRequest.getName(), userRequest.getEmail(),
                 userRequest.getAddress(), userRequest.getPhone());
 
-        long id = userRepository.save(user);
+        long id = userRepository.save(userRequest);
         user.setId(id);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(mapUserToResponse(user));

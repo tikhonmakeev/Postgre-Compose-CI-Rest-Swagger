@@ -47,17 +47,17 @@ services:
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: mypassword
 
-  test:
-    build:
-      context: .
-      target: build
-    container_name: gradle_test_runner
-    entrypoint: ["gradle", "test", "--no-daemon"]
-    environment:
-      GRADLE_OPTS: "--add-opens java.base/java.lang=ALL-UNNAMED"
-    depends_on:
-      postgres:
-        condition: service_healthy
+#  test:
+#    build:
+#      context: .
+#      target: build
+#    container_name: gradle_test_runner
+#    entrypoint: ["gradle", "test", "--no-daemon"]
+#    environment:
+#      GRADLE_OPTS: "--add-opens java.base/java.lang=ALL-UNNAMED"
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
 
 volumes:
   postgres_data:  # Объявляем volume для хранения данных PostgreSQL

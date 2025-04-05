@@ -80,7 +80,6 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, entity.getOrderId());
             ps.setLong(2, entity.getProductId());
             ps.setInt(3, entity.getQuantity());
             ps.setFloat(4, entity.getPrice());
