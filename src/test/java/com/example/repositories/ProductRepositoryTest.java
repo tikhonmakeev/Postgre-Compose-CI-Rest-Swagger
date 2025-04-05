@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +36,7 @@ class ProductRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product(1L, "Test Product", "Description", 666.666f, "Electronics");
+        product = new Product(1L, "Test Product", "Description", new BigDecimal("666.666"), "Electronics");
     }
 
     @Test

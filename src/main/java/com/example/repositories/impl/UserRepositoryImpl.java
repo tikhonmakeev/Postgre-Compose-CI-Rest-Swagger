@@ -76,16 +76,18 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public long save(User entity) {
-        String sql = "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)";
+    public long save(User user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, entity.getName());
-            ps.setString(2, entity.getEmail());
-            ps.setString(3, entity.getAddress());
-            ps.setString(4, entity.getPhone());
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)",
+                    new String[] {"id"}
+            );
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getAddress());
+            ps.setString(4, user.getPhone());
             return ps;
         }, keyHolder);
 
