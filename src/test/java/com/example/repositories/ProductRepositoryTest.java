@@ -1,5 +1,6 @@
 package com.example.repositories;
 
+import com.example.dto.product.ProductRequest;
 import com.example.models.Product;
 import com.example.repositories.impl.ProductRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +33,12 @@ class ProductRepositoryTest {
     private ProductRepositoryImpl productRepository;
 
     private Product product;
+    private ProductRequest productRequest;
 
     @BeforeEach
     void setUp() {
-            product = new Product(1L, "Test Product", "Description", 666.666f, "Electronics");
+        product = new Product(1L, "Test Product", "Description", 666.666f, "Electronics");
+        productRequest = new ProductRequest("Test Product", "Description", 666.666f, "Electronics");
     }
 
     @Test
@@ -111,7 +114,7 @@ class ProductRepositoryTest {
             kh.getKeyList().add(Collections.singletonMap("id", 1L));
             return 1;
         }).when(jdbcTemplate).update(any(), any(KeyHolder.class));
-        long id = productRepository.save(product);
+        long id = productRepository.save(productRequest);
 
         assertEquals(1L, id);
         verify(jdbcTemplate).update(any(), any(KeyHolder.class));

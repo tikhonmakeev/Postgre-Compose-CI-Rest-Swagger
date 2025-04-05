@@ -1,5 +1,6 @@
 package com.example.services;
 
+import com.example.dto.product.ProductRequest;
 import com.example.models.Product;
 import com.example.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +44,16 @@ public class ProductService {
     }
 
     @Transactional
-    public Product createProduct(Product product) {
-        long id = productRepository.save(product);
-        product.setId(id);
+    public Product createProduct(ProductRequest productRequest) {
+        long id = productRepository.save(productRequest);
+        Product product = Product.builder()
+                .description(productRequest.getDescription())
+                .price(productRequest.getPrice())
+                .name(productRequest.getName())
+                .category(productRequest.getCategory())
+                .id(id)
+                .build();
+
         return product;
     }
     @Transactional

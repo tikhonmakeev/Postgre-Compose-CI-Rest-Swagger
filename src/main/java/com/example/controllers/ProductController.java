@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import com.example.dto.product.ProductRequest;
 import com.example.models.Product;
 import com.example.services.ProductService;
 import jakarta.validation.Valid;
@@ -38,8 +39,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        Product savedProduct = productService.createProduct(product);
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductRequest productRequest) {
+        Product savedProduct = productService.createProduct(productRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 

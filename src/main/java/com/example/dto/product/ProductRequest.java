@@ -2,9 +2,11 @@ package com.example.dto.product;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class ProductRequest {
     @NotBlank(message = "Name is required")
     private String name;

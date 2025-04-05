@@ -1,5 +1,6 @@
 package com.example.repositories.impl;
 
+import com.example.dto.product.ProductRequest;
 import com.example.models.Product;
 import com.example.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             rs.getLong("id"),
             rs.getString("name"),
             rs.getString("description"),
-            rs.getBigDecimal("price"),
+            rs.getFloat("price"),
             rs.getString("category")
     );
 
@@ -65,8 +66,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         return jdbcTemplate.query(sql, productRowMapper);
     }
 
-    @Override
-    public long save(Product entity) {
+    public long save(ProductRequest entity) {
         String sql = "INSERT INTO products (name, description, price, category) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -74,7 +74,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, entity.getName());
             ps.setString(2, entity.getDescription());
-            ps.setBigDecimal(3, entity.getPrice());
+            ps.setFloat(3, entity.getPrice());
             ps.setString(4, entity.getCategory());
             return ps;
         }, keyHolder);

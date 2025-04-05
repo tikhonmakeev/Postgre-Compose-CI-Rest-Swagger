@@ -22,5 +22,5 @@ public class OrderItem {
     @Positive
     private int quantity;
     @Positive
-    private BigDecimal price;
+    private float price;
 }

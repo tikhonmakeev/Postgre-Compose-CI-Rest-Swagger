@@ -1,5 +1,6 @@
 package com.example.repositories.impl;
 
+import com.example.dto.order.OrderRequest;
 import com.example.models.Order;
 import com.example.models.OrderStatus;
 import com.example.repositories.OrderRepository;
@@ -66,8 +67,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         return jdbcTemplate.query(sql, orderRowMapper);
     }
 
-    @Override
-    public long save(Order entity) {
+    public long save(OrderRequest entity) {
         String sql = "INSERT INTO orders (user_id, order_date, status) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -75,7 +75,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, entity.getUserId());
             ps.setTimestamp(2, Timestamp.valueOf(entity.getOrderDate()));
-            ps.setString(3, entity.getStatus().name());
+            ps.setString(3, OrderStatus.NEW.name());
             return ps;
         }, keyHolder);
 

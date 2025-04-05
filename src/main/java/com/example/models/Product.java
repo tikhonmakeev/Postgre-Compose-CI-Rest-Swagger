@@ -2,10 +2,7 @@ package com.example.models;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -13,6 +10,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Product {
 
     @NotNull
@@ -22,7 +20,7 @@ public class Product {
     @NotBlank
     private String description;
     @NotNull
-    private BigDecimal price;
+    private float price;
     @NotBlank
     private String category;
 }

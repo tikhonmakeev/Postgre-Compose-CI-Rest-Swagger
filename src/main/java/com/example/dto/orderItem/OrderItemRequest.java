@@ -9,9 +9,6 @@ import lombok.Getter;
 @Data
 @Getter
 public class OrderItemRequest {
-    @NotNull(message = "Order ID is required")
-    private Long orderId;
-
     @NotNull(message = "Product ID is required")
     private Long productId;
 

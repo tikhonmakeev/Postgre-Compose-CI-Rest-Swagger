@@ -1,5 +1,6 @@
 package com.example.repositories.impl;
 
+import com.example.dto.orderItem.OrderItemRequest;
 import com.example.models.OrderItem;
 import com.example.repositories.OrderItemRepository;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
             rs.getLong("order_id"),
             rs.getLong("product_id"),
             rs.getInt("quantity"),
-            rs.getBigDecimal("price")
+            rs.getFloat("price")
     );
 
     @Override
@@ -73,8 +74,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
         return jdbcTemplate.query(sql, orderItemRowMapper);
     }
 
-    @Override
-    public long save(OrderItem entity) {
+    public long save(OrderItemRequest entity) {
         String sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -83,7 +83,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
             ps.setLong(1, entity.getOrderId());
             ps.setLong(2, entity.getProductId());
             ps.setInt(3, entity.getQuantity());
-            ps.setBigDecimal(4, entity.getPrice());
+            ps.setFloat(4, entity.getPrice());
             return ps;
         }, keyHolder);
 

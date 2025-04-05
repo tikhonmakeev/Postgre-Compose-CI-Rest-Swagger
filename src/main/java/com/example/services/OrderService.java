@@ -1,5 +1,7 @@
 package com.example.services;
 
+import com.example.dto.order.OrderCreate;
+import com.example.dto.order.OrderRequest;
 import com.example.dto.orderItem.OrderItemRequest;
 import com.example.models.*;
 import com.example.repositories.*;
@@ -24,15 +26,14 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Transactional
-    public Order createOrder(long userId, List<OrderItemRequest> items) {
-        validateUserExists(userId);
-
-        Order order = buildNewOrder(userId);
-        long savedOrderId = orderRepository.save(order);
-
-        order.setId(savedOrderId);
-
-        items.forEach(item -> addOrderItem(savedOrderId, item));
+    public Order createOrder(OrderCreate orderCreate) {
+        long savedOrderId = orderRepository.save(orderCreate);
+        Order order = Order.builder()
+                .userId(savedOrderId)
+                .id(savedOrderId)
+                .status(OrderStatus.NEW)
+                .orderDate(LocalDateTime.now())
+                .build();
 
         return order;
     }
@@ -65,12 +66,6 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
-    @Transactional
-    public void addItemsToOrder(long orderId, List<OrderItemRequest> items) {
-        validateOrderExists(orderId);
-        items.forEach(item -> addOrderItem(orderId, item));
-    }
-
     private Order buildNewOrder(long userId) {
         return Order.builder()
                 .userId(userId)
@@ -79,20 +74,6 @@ public class OrderService {
                 .build();
     }
 
-    private void addOrderItem(long orderId, OrderItemRequest item) {
-        Product product = getProduct(item.getProductId());
-        OrderItem orderItem = buildOrderItem(orderId, item, product);
-        orderItemRepository.save(orderItem);
-    }
-
-    private OrderItem buildOrderItem(long orderId, OrderItemRequest item, Product product) {
-        return OrderItem.builder()
-                .orderId(orderId)
-                .productId(product.getId())
-                .quantity(item.getQuantity())
-                .price(product.getPrice())
-                .build();
-    }
 
     private Product getProduct(long productId) {
         return productRepository.findById(productId)

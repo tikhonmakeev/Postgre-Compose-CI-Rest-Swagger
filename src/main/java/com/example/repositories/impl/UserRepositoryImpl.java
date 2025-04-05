@@ -1,5 +1,6 @@
 package com.example.repositories.impl;
 
+import com.example.dto.user.UserRequest;
 import com.example.models.User;
 import com.example.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -29,9 +30,9 @@ public class UserRepositoryImpl implements UserRepository {
             rs.getString("phone")
     );
 
-    public void createUser(String name, String email, String address, String phone) {
-        User user = new User(0, name, email, address, phone);
-        save(user);
+    public long createUser(String name, String email, String address, String phone) {
+        UserRequest user = new UserRequest(name, email, address, phone);
+        return save(user);
     }
 
     public void updateUser(long id, String newName, String newEmail, String newAddress, String newPhone) {
@@ -75,15 +76,12 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.query(sql, userRowMapper);
     }
 
-    @Override
-    public long save(User user) {
+    public long save(UserRequest user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)",
-                    new String[] {"id"}
-            );
+                    "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)");
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getAddress());
