@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,41 +16,25 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public List<Product> getAllProducts(String category, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getAllProducts(String category, Float minPrice, Float maxPrice) {
         List<Product> products = productRepository.findAll();
-        List<Product> filteredProducts = new ArrayList<>(products);
-
         if (category != null && !category.isEmpty()) {
-            List<Product> categoryFiltered = new ArrayList<>();
-            for (Product product : filteredProducts) {
-                if (category.equalsIgnoreCase(product.getCategory())) {
-                    categoryFiltered.add(product);
-                }
-            }
-            filteredProducts = categoryFiltered;
+            products = products.stream()
+                    .filter(product -> category.equalsIgnoreCase(product.getCategory()))
+                    .toList();
         }
-
         if (minPrice != null) {
-            List<Product> minPriceFiltered = new ArrayList<>();
-            for (Product product : filteredProducts) {
-                if (product.getPrice().compareTo(minPrice) >= 0) {
-                    minPriceFiltered.add(product);
-                }
-            }
-            filteredProducts = minPriceFiltered;
+            products = products.stream()
+                    .filter(product -> product.getPrice() >= minPrice)
+                    .toList();
         }
-
         if (maxPrice != null) {
-            List<Product> maxPriceFiltered = new ArrayList<>();
-            for (Product product : filteredProducts) {
-                if (product.getPrice().compareTo(maxPrice) <= 0) {
-                    maxPriceFiltered.add(product);
-                }
-            }
-            filteredProducts = maxPriceFiltered;
+            products = products.stream()
+                    .filter(product -> product.getPrice() <= maxPrice)
+                    .toList();
         }
 
-        return filteredProducts;
+        return products;
     }
 
     @Transactional(readOnly = true)
@@ -66,7 +48,6 @@ public class ProductService {
         product.setId(id);
         return product;
     }
-
     @Transactional
     public Optional<Product> updateProduct(Long id, Product productDetails) {
         if (!productRepository.existsById(id)) {

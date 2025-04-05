@@ -37,7 +37,7 @@ class ProductControllerTest {
         product = new Product();
         product.setId(1L);
         product.setName("Test Product");
-        product.setPrice(666.666);
+        product.setPrice(666.666f);
         product.setCategory("Electronics");
         product.setDescription("Test");
     }
@@ -46,8 +46,8 @@ class ProductControllerTest {
     void getAllProducts_Products() {
         List<Product> products = Arrays.asList(product);
         String category = "Electronics";
-        Double minPrice = 50.0;
-        Double maxPrice = 150.0;
+        float minPrice = 50.0f;
+        float maxPrice = 150.0f;
 
         when(productService.getAllProducts(category, minPrice, maxPrice)).thenReturn(products);
         ResponseEntity<List<Product>> response = productController.getAllProducts(category, minPrice, maxPrice);

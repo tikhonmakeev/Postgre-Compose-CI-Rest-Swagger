@@ -46,7 +46,7 @@ class OrderServiceTest {
 
         Product product = new Product();
         product.setId(productId);
-        product.setPrice(100.0F);
+        product.setPrice(100.0f);
 
         OrderItemRequest orderItemRequest = new OrderItemRequest();
         orderItemRequest.setProductId(productId);
