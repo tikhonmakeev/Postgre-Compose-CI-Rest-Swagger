@@ -56,7 +56,7 @@ class OrderServiceTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(orderRepository.save(any(Order.class))).thenReturn(orderId);
 
-        Order result = orderService.createOrder(List.of(orderItemRequest));
+        Order result = orderService.createOrderWithItems(List.of(orderItemRequest));
 
         assertNotNull(result);
         assertEquals(userId, result.getUserId());
@@ -74,7 +74,7 @@ class OrderServiceTest {
         long  userId = 1L;
         when(userRepository.existsById(userId)).thenReturn(false);
 
-        assertThrows(NotFoundException.class, () -> orderService.createOrder(Collections.emptyList()));
+        assertThrows(NotFoundException.class, () -> orderService.createOrderWithItems(Collections.emptyList()));
 
         verify(userRepository).existsById(userId);
         verifyNoInteractions(productRepository, orderRepository, orderItemRepository);
@@ -147,7 +147,7 @@ class OrderServiceTest {
         when(userRepository.existsById(userId)).thenReturn(true);
         when(orderRepository.save(any(Order.class))).thenReturn(orderId);
 
-        Order result = orderService.createOrder(Collections.emptyList());
+        Order result = orderService.createOrderWithItems(Collections.emptyList());
 
         assertNotNull(result);
         assertEquals(userId, result.getUserId());

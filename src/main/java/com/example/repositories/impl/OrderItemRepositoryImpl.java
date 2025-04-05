@@ -1,6 +1,6 @@
 package com.example.repositories.impl;
 
-import com.example.dto.orderItem.OrderItemRequest;
+import com.example.dto.orderItem.OrderItemWithPrice;
 import com.example.models.OrderItem;
 import com.example.repositories.OrderItemRepository;
 import lombok.AllArgsConstructor;
@@ -74,7 +74,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
         return jdbcTemplate.query(sql, orderItemRowMapper);
     }
 
-    public long save(OrderItemRequest entity) {
+    public long save(OrderItemWithPrice entity) {
         String sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 

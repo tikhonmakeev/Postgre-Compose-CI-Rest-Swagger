@@ -2,7 +2,9 @@ package com.example.services;
 
 import com.example.dto.order.OrderCreate;
 import com.example.dto.order.OrderRequest;
+import com.example.dto.order.OrderResponse;
 import com.example.dto.orderItem.OrderItemRequest;
+import com.example.dto.orderItem.OrderItemResponse;
 import com.example.models.*;
 import com.example.repositories.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,18 +27,39 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderItemService orderItemService;
 
     @Transactional
-    public Order createOrder(OrderCreate orderCreate) {
+    public List<OrderItemResponse> addItemsToOrder(long orderId, List<OrderItemRequest> items) {
+        List<OrderItemResponse> orderItemResponses = new ArrayList<>();
+
+        for (OrderItemRequest item : items) {
+            orderItemResponses.add(orderItemService.addOrderItem(orderId, item));
+        }
+
+        return orderItemResponses;
+    }
+
+    @Transactional
+    public Order createOrderWithItems(OrderRequest orderRequest) {
+        OrderCreate orderCreate = OrderCreate.builder()
+                .userId(orderRequest.getUserId())
+                .orderDate(orderRequest.getOrderDate())
+                .build();
+
         long savedOrderId = orderRepository.save(orderCreate);
-        Order order = Order.builder()
+
+        List<OrderItemResponse> orderItemResponses = addItemsToOrder(savedOrderId, orderRequest.getItems());
+
+        OrderResponse orderResponse = Order.builder()
                 .userId(savedOrderId)
                 .id(savedOrderId)
                 .status(OrderStatus.NEW)
                 .orderDate(LocalDateTime.now())
+                .orderItemResponses(orderItemResponses)
                 .build();
 
-        return order;
+        return orderResponse;
     }
 
     @Transactional

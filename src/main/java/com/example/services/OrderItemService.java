@@ -1,8 +1,8 @@
 package com.example.services;
 
+import com.example.dto.orderItem.OrderItemWithPrice;
 import com.example.dto.orderItem.OrderItemRequest;
 import com.example.dto.orderItem.OrderItemResponse;
-import com.example.models.Order;
 import com.example.models.OrderItem;
 import com.example.models.Product;
 import com.example.repositories.OrderItemRepository;
@@ -46,15 +46,21 @@ public class OrderItemService {
         validateOrderExists(orderId);
         Product product = getProductById(request.getProductId());
 
-        OrderItem orderItem = OrderItem.builder()
-                .orderId(orderId)
+        OrderItemWithPrice orderItemWithPrice = OrderItemWithPrice.builder()
                 .productId(product.getId())
                 .quantity(request.getQuantity())
                 .price(product.getPrice())
                 .build();
 
-        long id = orderItemRepository.save(orderItem);
-        orderItem.setId(id);
+        long orderItemId = orderItemRepository.save(orderItemWithPrice);
+
+        OrderItem orderItem = OrderItem.builder()
+                .id(orderItemId)
+                .orderId(orderId)
+                .price(orderItemWithPrice.getPrice())
+                .productId(request.getProductId())
+                .quantity(request.getQuantity())
+                .build();
 
         return mapToResponse(orderItem);
     }
