@@ -1,0 +1,14 @@
+package com.example.repositories;
+
+import com.example.dto.order.OrderCreate;
+import com.example.models.Order;
+import com.example.models.OrderStatus;
+
+import java.util.List;
+
+public interface OrderRepository extends CrudRepository<Order>  {
+    void updateStatus(Long orderId, OrderStatus status);
+    List<Order> findByUserId(Long userId);
+    public long save(OrderCreate orderCreate);
+    void update(Order order);
+}
