@@ -17,6 +17,6 @@ public class OrderResponse {
     private Long userId;
     private LocalDateTime orderDate;
     private OrderStatus status;
-    private List<OrderItemResponse> orderItemResponses;
+    private List<OrderItemResponse> items;
     private float totalAmount;
 }

@@ -110,6 +110,7 @@ public class OrderItemService {
 
         OrderItemResponse response = new OrderItemResponse();
         response.setId(orderItem.getId());
+        response.setOrderId(orderItem.getOrderId());
         response.setProductId(orderItem.getProductId());
         response.setProductName(product.getName());
         response.setQuantity(orderItem.getQuantity());

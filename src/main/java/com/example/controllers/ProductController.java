@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
 
 import java.util.List;
 
@@ -22,15 +23,17 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @Operation(description = "Get all products with optional filters")
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts(
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) float minPrice,
-            @RequestParam(required = false) float maxPrice) {
+            @RequestParam(required = false) long minPrice,
+            @RequestParam(required = false) long maxPrice) {
         List<Product> products = productService.getAllProducts(category, minPrice, maxPrice);
         return ResponseEntity.ok(products);
     }
 
+    @Operation(description = "Get product by id")
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductRequest productRequest) {
         Product savedProduct = productService.createProduct(productRequest);
@@ -53,6 +56,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(description = "Delete product by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         if (productService.deleteProduct(id)) {

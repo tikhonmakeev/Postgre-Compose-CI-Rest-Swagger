@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
 
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
+    @Operation(description = "Get all users")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = userRepository.findAll().stream()
@@ -33,6 +35,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @Operation(description = "Get user by id")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
@@ -41,6 +44,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(description = "Create new user")
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
@@ -56,6 +60,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapUserToResponse(user));
     }
 
+    @Operation(description = "Update existing user by id")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,
                                                    @Valid @RequestBody UserRequest userRequest) {
@@ -75,6 +80,7 @@ public class UserController {
         return ResponseEntity.ok(mapUserToResponse(user));
     }
 
+    @Operation(description = "Delete user by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         if (!userRepository.existsById(id)) {

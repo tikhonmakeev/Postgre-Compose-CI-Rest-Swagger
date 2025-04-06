@@ -56,7 +56,7 @@ public class OrderService {
                 .id(savedOrderId)
                 .status(OrderStatus.NEW)
                 .orderDate(LocalDateTime.now())
-                .orderItemResponses(orderItemResponses)
+                .items(orderItemResponses)
                 .build();
 
         return orderResponse;
