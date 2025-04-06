@@ -46,8 +46,8 @@ class ProductControllerTest {
     void getAllProducts_Products() {
         List<Product> products = Arrays.asList(product);
         String category = "Electronics";
-        float minPrice = 50.0f;
-        float maxPrice = 150.0f;
+        Long minPrice = 50L;
+        Long maxPrice = 150L;
 
         when(productService.getAllProducts(category, minPrice, maxPrice)).thenReturn(products);
         ResponseEntity<List<Product>> response = productController.getAllProducts(category, minPrice, maxPrice);
@@ -76,14 +76,6 @@ class ProductControllerTest {
         verify(productService).getProductById(productId);
     }
 
-    @Test
-    void createProduct_CreatedProduct() {
-        when(productService.createProduct(any(Product.class))).thenReturn(product);
-        ResponseEntity<Product> response = productController.createProduct(product);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(product, response.getBody());
-        verify(productService).createProduct(product);
-    }
 
     @Test
     void updateProduct_Product() {

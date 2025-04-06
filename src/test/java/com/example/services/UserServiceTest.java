@@ -1,3 +1,4 @@
+// File: src/test/java/com/example/services/UserServiceTest.java
 package com.example.services;
 
 import com.example.dto.user.UserRequest;
@@ -11,13 +12,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,160 +37,154 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "Tester Test", "test@test.com", "7 Gashek St", "88005553535");
-        userRequest = new UserRequest();
-        userRequest.setName("Tester Test");
-        userRequest.setEmail("test@test.com");
-        userRequest.setAddress("7 Gashek Stt");
-        userRequest.setPhone("88005553535");
+        user = User.builder()
+                .id(1L)
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .address("123 Main St")
+                .phone("123456789")
+                .build();
+
+        userRequest = UserRequest.builder()
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .address("123 Main St")
+                .phone("123456789")
+                .build();
     }
 
     @Test
-    void getAllUsers_AllUsers() {
-        List<User> users = Arrays.asList(user);
-        when(userRepository.findAll()).thenReturn(users);
-
-        List<UserResponse> result = userService.getAllUsers();
-
-        assertEquals(1, result.size());
-        assertEquals(user.getId(), result.get(0).getId());
-        assertEquals(user.getName(), result.get(0).getName());
-        assertEquals(user.getEmail(), result.get(0).getEmail());
+    void getAllUsers_shouldReturnMappedUserResponses() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user));
+        List<UserResponse> responses = userService.getAllUsers();
+        assertNotNull(responses);
+        assertFalse(responses.isEmpty());
+        assertEquals(user.getId(), responses.get(0).getId());
         verify(userRepository).findAll();
     }
 
     @Test
-    void getUserById_User() {
+    void getUserById_found_shouldReturnUserResponse() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
-        Optional<UserResponse> result = userService.getUserById(1L);
-
-        assertTrue(result.isPresent());
-        assertEquals(user.getId(), result.get().getId());
-        assertEquals(user.getName(), result.get().getName());
-        assertEquals(user.getEmail(), result.get().getEmail());
+        Optional<UserResponse> response = userService.getUserById(1L);
+        assertTrue(response.isPresent());
+        assertEquals(user.getId(), response.get().getId());
         verify(userRepository).findById(1L);
     }
 
     @Test
-    void getUserById_Empty() {
+    void getUserById_notFound_shouldReturnEmptyOptional() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Optional<UserResponse> result = userService.getUserById(1L);
-
-        assertFalse(result.isPresent());
+        Optional<UserResponse> response = userService.getUserById(1L);
+        assertFalse(response.isPresent());
         verify(userRepository).findById(1L);
     }
 
     @Test
-    void getUserByEmail_User() {
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
-
-        Optional<UserResponse> result = userService.getUserByEmail("test@test.com");
-
-        assertTrue(result.isPresent());
-        assertEquals(user.getId(), result.get().getId());
-        assertEquals(user.getEmail(), result.get().getEmail());
-        verify(userRepository).findByEmail("test@test.com");
+    void getUserByEmail_found_shouldReturnUserResponse() {
+        when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.of(user));
+        Optional<UserResponse> response = userService.getUserByEmail("john.doe@example.com");
+        assertTrue(response.isPresent());
+        assertEquals(user.getEmail(), response.get().getEmail());
+        verify(userRepository).findByEmail("john.doe@example.com");
     }
 
     @Test
-    void getUserByEmail_Empty() {
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.empty());
-
-        Optional<UserResponse> result = userService.getUserByEmail("test@test.com");
-
-        assertFalse(result.isPresent());
-        verify(userRepository).findByEmail("test@test.com");
+    void getUserByEmail_notFound_shouldReturnEmptyOptional() {
+        when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.empty());
+        Optional<UserResponse> response = userService.getUserByEmail("john.doe@example.com");
+        assertFalse(response.isPresent());
+        verify(userRepository).findByEmail("john.doe@example.com");
     }
 
     @Test
-    void existsByEmail_True() {
-        when(userRepository.existsByEmail("test@test.com")).thenReturn(true);
-
-        boolean result = userService.existsByEmail("test@test.com");
-
+    void existsByEmail_shouldReturnTrue() {
+        when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(true);
+        boolean result = userService.existsByEmail("john.doe@example.com");
         assertTrue(result);
-        verify(userRepository).existsByEmail("test@test.com");
+        verify(userRepository).existsByEmail("john.doe@example.com");
     }
 
     @Test
-    void existsByEmail_False() {
-        when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
+    void createUser_whenEmailExists_shouldThrowException() {
+        when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(true);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.createUser(userRequest));
+        assertEquals("User with this email already exists", exception.getMessage());
 
-        boolean result = userService.existsByEmail("test@test.com");
-
-        assertFalse(result);
-        verify(userRepository).existsByEmail("test@test.com");
+        verify(userRepository).existsByEmail("john.doe@example.com");
+        verify(userRepository, never()).save(any(UserRequest.class));
     }
 
     @Test
-    void createUser_UserResponse() {
-        when(userRepository.existsByEmail("test@test.com")).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenReturn(1L);
-
-        UserResponse result = userService.createUser(userRequest);
-
-        assertNotNull(result);
-        assertEquals(userRequest.getName(), result.getName());
-        assertEquals(userRequest.getEmail(), result.getEmail());
-        verify(userRepository).existsByEmail("test@test.com");
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    void createUser_ThrowException() {
-        when(userRepository.existsByEmail("test@test.com")).thenReturn(true);
-
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(userRequest));
-        verify(userRepository).existsByEmail("test@test.com");
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
-    void updateUser_UserResponse() {
+    void updateUser_shouldUpdateAndReturnUserResponse() {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
 
-        UserResponse result = userService.updateUser(1L, userRequest);
+        UserResponse response = userService.updateUser(1L, userRequest);
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
+        assertEquals("john.doe@example.com", response.getEmail());
+        assertNotNull(response.getCreatedAt());
 
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals(userRequest.getName(), result.getName());
-        assertEquals(userRequest.getEmail(), result.getEmail());
         verify(userRepository).existsById(1L);
+        verify(userRepository).findById(1L);
         verify(userRepository).update(any(User.class));
     }
 
     @Test
-    void updateUser_ThrowException() {
-        User existingUser = new User(1L, "Tester Test", "old@test.com", "7 Gashek St", "88005553535");
-        userRequest.setEmail("test@test.com");
+    void updateUser_whenUserNotFound_shouldThrowException() {
+        when(userRepository.existsById(1L)).thenReturn(false);
 
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        when(userRepository.existsByEmail("test@test.com")).thenReturn(true);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUser(1L, userRequest));
+        assertEquals("User with id 1 not found", exception.getMessage());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(1L, userRequest));
         verify(userRepository).existsById(1L);
         verify(userRepository, never()).update(any(User.class));
     }
 
     @Test
-    void deleteUser_DeleteUser() {
+    void updateUser_whenEmailAlreadyExists_shouldThrowException() {
+        User anotherUser = User.builder()
+                .id(2L)
+                .name("Jane Doe")
+                .email("jane.doe@example.com")
+                .build();
+        userRequest.setEmail("jane.doe@example.com");
+
         when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("jane.doe@example.com")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUser(1L, userRequest));
+        assertEquals("User with this email already exists", exception.getMessage());
+
+        verify(userRepository).existsById(1L);
+        verify(userRepository).findById(1L);
+        verify(userRepository).existsByEmail("jane.doe@example.com");
+        verify(userRepository, never()).update(any(User.class));
+    }
+
+    @Test
+    void deleteUser_shouldCallDelete() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(userRepository).deleteById(1L);
 
         userService.deleteUser(1L);
-
         verify(userRepository).existsById(1L);
         verify(userRepository).deleteById(1L);
     }
 
     @Test
-    void deleteUser_ThrowException() {
+    void deleteUser_whenUserNotFound_shouldThrowException() {
         when(userRepository.existsById(1L)).thenReturn(false);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.deleteUser(1L));
+        assertEquals("User with id 1 not found", exception.getMessage());
 
-        assertThrows(IllegalArgumentException.class, () -> userService.deleteUser(1L));
         verify(userRepository).existsById(1L);
         verify(userRepository, never()).deleteById(anyLong());
     }

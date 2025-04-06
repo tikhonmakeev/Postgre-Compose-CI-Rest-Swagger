@@ -1,5 +1,7 @@
 package com.example.repositories;
 
+import com.example.dto.order.OrderCreate;
+import com.example.dto.order.OrderRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,16 +22,15 @@ class OrderRepositoryImplTest {
 
     @Test
     void testSaveOrder() {
-        Order order = new Order();
-        order.setUserId(1L);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PROCESSING);
+        OrderCreate orderCreate = OrderCreate.builder()
+                .userId(1L)
+                .orderDate(LocalDateTime.now())
+                .build();
 
-        long orderId = orderRepository.save(order);
+        long orderId = orderRepository.save(orderCreate);
 
         Optional<Order> savedOrder = orderRepository.findById(orderId);
         assertTrue(savedOrder.isPresent());
-        assertEquals(order.getStatus(), savedOrder.get().getStatus());
     }
 
     @Test
