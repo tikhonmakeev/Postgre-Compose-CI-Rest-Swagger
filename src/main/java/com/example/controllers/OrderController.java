@@ -5,10 +5,16 @@ import com.example.dto.orderItem.OrderItemRequest;
 import com.example.models.Order;
 import com.example.models.OrderStatus;
 import com.example.services.OrderService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+
 
 @RestController
 @RequestMapping("/api/orders")
