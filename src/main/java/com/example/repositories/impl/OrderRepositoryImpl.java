@@ -1,6 +1,6 @@
 package com.example.repositories.impl;
 
-import com.example.dto.order.OrderRequest;
+import com.example.dto.order.OrderCreate;
 import com.example.models.Order;
 import com.example.models.OrderStatus;
 import com.example.repositories.OrderRepository;
@@ -67,8 +67,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         return jdbcTemplate.query(sql, orderRowMapper);
     }
 
-    public long save(OrderRequest entity) {
-        String sql = "INSERT INTO orders (user_id, order_date, status) VALUES (?, ?, ?)";
+    public long save(OrderCreate entity) {
+        String sql = "INSERT INTO orders (user_id, order_date, status) VALUES (?, ?, ?) RETURNING id";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -88,7 +88,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         jdbcTemplate.update(sql,
                 entity.getUserId(),
                 Timestamp.valueOf(entity.getOrderDate()),
-                entity.getStatus(),
+                entity.getStatus().name(),
                 entity.getId());
     }
 

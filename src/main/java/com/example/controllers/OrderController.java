@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import com.example.dto.order.OrderRequest;
+import com.example.dto.order.OrderResponse;
 import com.example.models.Order;
 import com.example.models.OrderStatus;
 import com.example.services.OrderService;
@@ -20,9 +21,9 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest) {
 
-        Order order = orderService.createOrderWithItems(orderRequest);
+        OrderResponse order = orderService.createOrderWithItems(orderRequest);
         return ResponseEntity.ok(order);
     }
 

@@ -47,6 +47,7 @@ public class OrderItemService {
         Product product = getProductById(request.getProductId());
 
         OrderItemWithPrice orderItemWithPrice = OrderItemWithPrice.builder()
+                .orderId(orderId)
                 .productId(product.getId())
                 .quantity(request.getQuantity())
                 .price(product.getPrice())

@@ -41,7 +41,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrderWithItems(OrderRequest orderRequest) {
+    public OrderResponse createOrderWithItems(OrderRequest orderRequest) {
         OrderCreate orderCreate = OrderCreate.builder()
                 .userId(orderRequest.getUserId())
                 .orderDate(orderRequest.getOrderDate())
@@ -51,8 +51,8 @@ public class OrderService {
 
         List<OrderItemResponse> orderItemResponses = addItemsToOrder(savedOrderId, orderRequest.getItems());
 
-        OrderResponse orderResponse = Order.builder()
-                .userId(savedOrderId)
+        OrderResponse orderResponse = OrderResponse.builder()
+                .userId(orderRequest.getUserId())
                 .id(savedOrderId)
                 .status(OrderStatus.NEW)
                 .orderDate(LocalDateTime.now())
@@ -80,7 +80,7 @@ public class OrderService {
     public Order updateOrderStatus(long orderId, OrderStatus status) {
         Order order = getOrderById(orderId);
         order.setStatus(status);
-        orderRepository.save(order);
+        orderRepository.update(order);
         return order;
     }
 

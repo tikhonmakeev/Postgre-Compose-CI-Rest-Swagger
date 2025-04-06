@@ -49,16 +49,9 @@ public class UserService {
             throw new IllegalArgumentException("User with this email already exists");
         }
 
-        User user = new User(0,
-                userRequest.getName(),
-                userRequest.getEmail(),
-                userRequest.getAddress(),
-                userRequest.getPhone());
+        long id = userRepository.save(userRequest);
 
-        long id = userRepository.save(user);
-        user.setId(id);
-
-        return mapUserToResponse(user);
+        return mapUserRequestToResponse(id, userRequest);
     }
 
     @Transactional
@@ -73,15 +66,17 @@ public class UserService {
             throw new IllegalArgumentException("Email is already in use");
         }
 
-        User user = new User(id,
-                userRequest.getName(),
-                userRequest.getEmail(),
-                userRequest.getAddress(),
-                userRequest.getPhone());
+        User user = User.builder()
+                .address(userRequest.getAddress())
+                .phone(userRequest.getPhone())
+                .name(userRequest.getName())
+                .email(userRequest.getEmail())
+                .id(id)
+                .build();
 
         userRepository.update(user);
 
-        return mapUserToResponse(user);
+        return mapUserRequestToResponse(id, userRequest);
     }
 
     @Transactional
@@ -92,14 +87,25 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    private UserResponse mapUserRequestToResponse(long userId, UserRequest userRequest) {
+        return UserResponse.builder()
+                .id(userId)
+                .name(userRequest.getName())
+                .email(userRequest.getEmail())
+                .address(userRequest.getAddress())
+                .phone(userRequest.getPhone())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     private UserResponse mapUserToResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        response.setAddress(user.getAddress());
-        response.setPhone(user.getPhone());
-        response.setCreatedAt(LocalDateTime.now());
-        return response;
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .phone(user.getPhone())
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 }

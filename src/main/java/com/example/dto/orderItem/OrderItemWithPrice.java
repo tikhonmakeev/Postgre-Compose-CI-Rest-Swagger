@@ -9,6 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class OrderItemWithPrice {
+    @NotNull(message = "Order ID is required")
+    private Long orderId;
 
     @NotNull(message = "Product ID is required")
     private Long productId;

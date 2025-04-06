@@ -75,11 +75,12 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     }
 
     public long save(OrderItemWithPrice entity) {
-        String sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?) RETURNING id";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, entity.getOrderId());
             ps.setLong(2, entity.getProductId());
             ps.setInt(3, entity.getQuantity());
             ps.setFloat(4, entity.getPrice());
@@ -91,6 +92,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
 
     @Override
     public void update(OrderItem entity) {
+        existsById(entity.getId());
         String sql = "UPDATE order_items SET order_id = ?, product_id = ?, quantity = ?, price = ? WHERE id = ?";
         jdbcTemplate.update(sql,
                 entity.getOrderId(),

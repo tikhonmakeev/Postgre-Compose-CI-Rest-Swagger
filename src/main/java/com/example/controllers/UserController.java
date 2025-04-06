@@ -85,13 +85,13 @@ public class UserController {
     }
 
     private UserResponse mapUserToResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        response.setAddress(user.getAddress());
-        response.setPhone(user.getPhone());
-        response.setCreatedAt(LocalDateTime.now());
-        return response;
+        return UserResponse.builder()
+                .id(user.getId())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .name(user.getName())
+                .email(user.getEmail())
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 }

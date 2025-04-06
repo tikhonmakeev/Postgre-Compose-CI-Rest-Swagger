@@ -30,15 +30,6 @@ public class UserRepositoryImpl implements UserRepository {
             rs.getString("phone")
     );
 
-    public long createUser(String name, String email, String address, String phone) {
-        UserRequest user = new UserRequest(name, email, address, phone);
-        return save(user);
-    }
-
-    public void updateUser(long id, String newName, String newEmail, String newAddress, String newPhone) {
-        User user = new User(id, newName, newEmail, newAddress, newPhone);
-        update(user);
-    }
 
     public void deleteUser(long id) {
         deleteById(id);
@@ -81,7 +72,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?)");
+                    "INSERT INTO users (name, email, address, phone) VALUES (?, ?, ?, ?) RETURNING id", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getAddress());
@@ -113,6 +104,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void update(User entity) {
+        existsById(entity.getId());
         String sql = "UPDATE users SET name = ?, email = ?, address = ?, phone = ? WHERE id = ?";
         jdbcTemplate.update(sql,
                 entity.getName(),

@@ -67,7 +67,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     public long save(ProductRequest entity) {
-        String sql = "INSERT INTO products (name, description, price, category) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO products (name, description, price, category) VALUES (?, ?, ?, ?) RETURNING id";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
