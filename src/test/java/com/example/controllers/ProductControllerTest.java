@@ -1,28 +1,29 @@
 package com.example.controllers;
 
+import com.example.dto.product.ProductRequest;
 import com.example.models.Product;
 import com.example.services.ProductService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
+
+    private MockMvc mockMvc;
 
     @Mock
     private ProductService productService;
@@ -30,90 +31,199 @@ class ProductControllerTest {
     @InjectMocks
     private ProductController productController;
 
-    private Product product;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private Product testProduct;
+    private ProductRequest testProductRequest;
 
     @BeforeEach
     void setUp() {
-        product = new Product();
-        product.setId(1L);
-        product.setName("Test Product");
-        product.setPrice(666.666f);
-        product.setCategory("Electronics");
-        product.setDescription("Test");
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+
+        testProduct = Product.builder()
+                .id(1L)
+                .name("prod test name")
+                .description("some test in descr")
+                .price(100.0f)
+                .category("category")
+                .build();
+
+        testProductRequest = new ProductRequest(
+                "prod test name",
+                "some test in descr",
+                100.0f,
+                "category");
     }
 
     @Test
-    void getAllProducts_Products() {
-        List<Product> products = Arrays.asList(product);
-        String category = "Electronics";
-        Long minPrice = 50L;
-        Long maxPrice = 150L;
+    void getAllProducts_ShouldReturnProducts() throws Exception {
+        when(productService.getAllProducts(null, null, null))
+                .thenReturn(Collections.singletonList(testProduct));
 
-        when(productService.getAllProducts(category, minPrice, maxPrice)).thenReturn(products);
-        ResponseEntity<List<Product>> response = productController.getAllProducts(category, minPrice, maxPrice);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(products, response.getBody());
-        verify(productService).getAllProducts(category, minPrice, maxPrice);
+        mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L));
     }
 
     @Test
-    void getProductById_Product() {
-        Long productId = 1L;
-        when(productService.getProductById(productId)).thenReturn(Optional.of(product));
-        ResponseEntity<Product> response = productController.getProductById(productId);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(product, response.getBody());
-        verify(productService).getProductById(productId);
+    void getAllProducts_WithCategoryFilter_ShouldReturnFilteredProducts() throws Exception {
+        when(productService.getAllProducts("Electronics", null, null))
+                .thenReturn(Collections.singletonList(testProduct));
+
+        mockMvc.perform(get("/api/products")
+                        .param("category", "Electronics"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void getProductById_NotFound() {
-        Long productId = 1L;
-        when(productService.getProductById(productId)).thenReturn(Optional.empty());
-        ResponseEntity<Product> response = productController.getProductById(productId);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(productService).getProductById(productId);
-    }
+    void getAllProducts_WithPriceFilters_ShouldReturnFilteredProducts() throws Exception {
+        when(productService.getAllProducts(null, 100L, 200L))
+                .thenReturn(Collections.singletonList(testProduct));
 
-
-    @Test
-    void updateProduct_Product() {
-        Long productId = 1L;
-        when(productService.updateProduct(eq(productId), any(Product.class))).thenReturn(Optional.of(product));
-        ResponseEntity<Product> response = productController.updateProduct(productId, product);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(product, response.getBody());
-        verify(productService).updateProduct(productId, product);
+        mockMvc.perform(get("/api/products")
+                        .param("minPrice", "100")
+                        .param("maxPrice", "200"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void updateProduct_NotFound() {
-        Long productId = 1L;
-        when(productService.updateProduct(eq(productId), any(Product.class))).thenReturn(Optional.empty());
-        ResponseEntity<Product> response = productController.updateProduct(productId, product);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(productService).updateProduct(productId, product);
+    void getAllProducts_WithAllFilters_ShouldReturnFilteredProducts() throws Exception {
+        when(productService.getAllProducts("Electronics", 100L, 200L))
+                .thenReturn(Collections.singletonList(testProduct));
+
+        mockMvc.perform(get("/api/products")
+                        .param("category", "Electronics")
+                        .param("minPrice", "100")
+                        .param("maxPrice", "200"))
+                .andExpect(status().isOk());
+    }
+    @Test
+    void getAllProducts_WithFilters_ShouldReturnFilteredProducts() throws Exception {
+        Product filteredProduct = Product.builder()
+                .id(2L)
+                .name("Filtered Product")
+                .price(150.0f)
+                .category("Electronics")
+                .build();
+
+        when(productService.getAllProducts("Electronics", 100L, 200L))
+                .thenReturn(Collections.singletonList(filteredProduct));
+
+        mockMvc.perform(get("/api/products")
+                        .param("category", "Electronics")
+                        .param("minPrice", "100")
+                        .param("maxPrice", "200"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Filtered Product"))
+                .andExpect(jsonPath("$[0].price").value(150.0));
+
+        verify(productService, times(1)).getAllProducts("Electronics", 100L, 200L);
     }
 
     @Test
-    void deleteProduct_NoContent() {
-        Long productId = 1L;
-        when(productService.deleteProduct(productId)).thenReturn(true);
-        ResponseEntity<Void> response = productController.deleteProduct(productId);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(productService).deleteProduct(productId);
+    void createProduct_ShouldReturnCreatedProduct() throws Exception {
+        when(productService.createProduct(any(ProductRequest.class))).thenReturn(testProduct);
+
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProductRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("prod test name"))
+                .andExpect(jsonPath("$.price").value(100.0));
+
+        verify(productService, times(1)).createProduct(any(ProductRequest.class));
     }
 
     @Test
-    void deleteProduct_NotFound() {
-        Long productId = 1L;
-        when(productService.deleteProduct(productId)).thenReturn(false);
-        ResponseEntity<Void> response = productController.deleteProduct(productId);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(productService).deleteProduct(productId);
+    void createProduct_WithInvalidData_ShouldReturnBadRequest() throws Exception {
+        ProductRequest invalidRequest = new ProductRequest("", "", -100.0f, "");
+
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(productService, never()).createProduct(any());
+    }
+
+    @Test
+    void getProductById_WhenProductExists_ShouldReturnProduct() throws Exception {
+        when(productService.getProductById(1L)).thenReturn(Optional.of(testProduct));
+
+        mockMvc.perform(get("/api/products/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("prod test name"));
+
+        verify(productService, times(1)).getProductById(1L);
+    }
+
+    @Test
+    void getProductById_WhenProductNotExists_ShouldReturnNotFound() throws Exception {
+        when(productService.getProductById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/products/1"))
+                .andExpect(status().isNotFound());
+
+        verify(productService, times(1)).getProductById(1L);
+    }
+
+    @Test
+    void updateProduct_WhenProductExists_ShouldReturnUpdatedProduct() throws Exception {
+        Product updatedProduct = Product.builder()
+                .id(1L)
+                .name("some new prod name")
+                .description("new descr")
+                .price(150.0f)
+                .category("new category")
+                .build();
+
+        when(productService.updateProduct(eq(1L), any(Product.class)))
+                .thenReturn(Optional.of(updatedProduct));
+
+        mockMvc.perform(put("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedProduct)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("some new prod name"))
+                .andExpect(jsonPath("$.description").value("new descr"))
+                .andExpect(jsonPath("$.price").value(150.0))
+                .andExpect(jsonPath("$.category").value("new category"));
+
+        verify(productService, times(1)).updateProduct(eq(1L), any(Product.class));
+    }
+
+    @Test
+    void updateProduct_WhenProductNotExists_ShouldReturnNotFound() throws Exception {
+        when(productService.updateProduct(eq(1L), any(Product.class)))
+                .thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testProduct)))
+                .andExpect(status().isNotFound());
+
+        verify(productService, times(1)).updateProduct(eq(1L), any(Product.class));
+    }
+
+    @Test
+    void deleteProduct_WhenProductExists_ShouldReturnNoContent() throws Exception {
+        when(productService.deleteProduct(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/products/1"))
+                .andExpect(status().isNoContent());
+
+        verify(productService, times(1)).deleteProduct(1L);
+    }
+
+    @Test
+    void deleteProduct_WhenProductNotExists_ShouldReturnNotFound() throws Exception {
+        when(productService.deleteProduct(1L)).thenReturn(false);
+
+        mockMvc.perform(delete("/api/products/1"))
+                .andExpect(status().isNotFound());
+
+        verify(productService, times(1)).deleteProduct(1L);
     }
 }

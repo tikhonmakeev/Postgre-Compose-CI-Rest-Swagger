@@ -108,14 +108,15 @@ public class OrderItemService {
     private OrderItemResponse mapToResponse(OrderItem orderItem) {
         Product product = getProductById(orderItem.getProductId());
 
-        OrderItemResponse response = new OrderItemResponse();
-        response.setId(orderItem.getId());
-        response.setOrderId(orderItem.getOrderId());
-        response.setProductId(orderItem.getProductId());
-        response.setProductName(product.getName());
-        response.setQuantity(orderItem.getQuantity());
-        response.setUnitPrice(orderItem.getPrice());
-        response.setTotalPrice(orderItem.getPrice() * orderItem.getQuantity());
+        OrderItemResponse response = OrderItemResponse.builder()
+                .id(orderItem.getId())
+                .orderId(orderItem.getOrderId())
+                .productId(orderItem.getProductId())
+                .productName(product.getName())
+                .quantity(orderItem.getQuantity())
+                .unitPrice(orderItem.getPrice())
+                .totalPrice(orderItem.getPrice() * orderItem.getQuantity())
+                .build();
 
         return response;
     }

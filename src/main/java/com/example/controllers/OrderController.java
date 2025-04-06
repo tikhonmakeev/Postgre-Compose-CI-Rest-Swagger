@@ -5,15 +5,11 @@ import com.example.dto.order.OrderResponse;
 import com.example.models.Order;
 import com.example.models.OrderStatus;
 import com.example.services.OrderService;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 
 
 @RestController
@@ -28,8 +24,7 @@ public class OrderController {
 
     @Operation(description = "Create new order")
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest) {
-
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         OrderResponse order = orderService.createOrderWithItems(orderRequest);
         return ResponseEntity.ok(order);
     }

@@ -13,7 +13,7 @@ public class OrderRequest {
     @NotNull(message = "User ID is required")
     private Long userId;
 
-    @NotEmpty(message = "Order date cannot be empty")
+    @NotNull(message = "Order date cannot be null")
     private LocalDateTime orderDate;
 
     @NotEmpty(message = "Order items cannot be empty")

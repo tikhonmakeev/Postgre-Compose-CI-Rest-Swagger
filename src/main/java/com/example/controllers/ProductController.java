@@ -27,8 +27,8 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts(
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) long minPrice,
-            @RequestParam(required = false) long maxPrice) {
+            @RequestParam(required = false) Long minPrice,
+            @RequestParam(required = false) Long maxPrice) {
         List<Product> products = productService.getAllProducts(category, minPrice, maxPrice);
         return ResponseEntity.ok(products);
     }

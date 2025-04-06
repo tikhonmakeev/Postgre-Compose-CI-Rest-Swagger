@@ -12,15 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -120,7 +117,6 @@ class UserServiceTest {
     void updateUser_shouldUpdateAndReturnUserResponse() {
         when(userRepository.existsById(1L)).thenReturn(true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
 
         UserResponse response = userService.updateUser(1L, userRequest);
         assertNotNull(response);
@@ -139,7 +135,7 @@ class UserServiceTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.updateUser(1L, userRequest));
-        assertEquals("User with id 1 not found", exception.getMessage());
+        assertEquals("User not found with id: 1", exception.getMessage());
 
         verify(userRepository).existsById(1L);
         verify(userRepository, never()).update(any(User.class));
@@ -160,7 +156,7 @@ class UserServiceTest {
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.updateUser(1L, userRequest));
-        assertEquals("User with this email already exists", exception.getMessage());
+        assertEquals("Email is already in use", exception.getMessage());
 
         verify(userRepository).existsById(1L);
         verify(userRepository).findById(1L);
@@ -183,7 +179,7 @@ class UserServiceTest {
         when(userRepository.existsById(1L)).thenReturn(false);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.deleteUser(1L));
-        assertEquals("User with id 1 not found", exception.getMessage());
+        assertEquals("User not found with id: 1", exception.getMessage());
 
         verify(userRepository).existsById(1L);
         verify(userRepository, never()).deleteById(anyLong());
