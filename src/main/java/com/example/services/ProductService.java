@@ -17,7 +17,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public List<Product> getAllProducts(String category, Float minPrice, Float maxPrice) {
+    public List<Product> getAllProducts(String category, Long minPrice, Long maxPrice) {
         List<Product> products = productRepository.findAll();
         if (category != null && !category.isEmpty()) {
             products = products.stream()
