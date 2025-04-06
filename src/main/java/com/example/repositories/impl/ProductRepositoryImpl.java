@@ -37,7 +37,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<Product> findByPriceBetween(float minPrice, float maxPrice) {
+    public List<Product> findByPriceBetween(Long minPrice, Long maxPrice) {
         String sql = "SELECT * FROM products WHERE price BETWEEN ? AND ?";
         return jdbcTemplate.query(sql, productRowMapper, minPrice, maxPrice);
     }

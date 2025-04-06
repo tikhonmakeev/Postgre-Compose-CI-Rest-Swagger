@@ -7,7 +7,7 @@ import com.example.models.OrderStatus;
 import com.example.services.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 
 @RestController
@@ -20,6 +20,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @Operation(description = "Create new order")
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody OrderRequest orderRequest) {
 
@@ -27,12 +28,14 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    @Operation(description = "Add items to existing order by id")
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
         Order order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 
+    @Operation(description = "Get all orders for specific user by id")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Order>> getUserOrders(
             @PathVariable Long userId) {
@@ -40,6 +43,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @Operation(description = "Update existing order by id")
     @PatchMapping("/{id}/status")
     public ResponseEntity<Order> updateOrderStatus(
             @PathVariable Long id,
