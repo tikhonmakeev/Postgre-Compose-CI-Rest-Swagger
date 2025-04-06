@@ -1,0 +1,26 @@
+stages:
+  - test
+
+variables:
+  DATABASE_URL: "postgresql://myuser:mypassword@postgres:5432/mydatabase"
+
+test:
+  stage: test
+  image: gradle:8.12.1-jdk17
+  tags:
+    - students-buildkit-medium
+  services:
+    - postgres:14
+  before_script:
+    - export PGPASSWORD=mypassword
+    - psql -h postgres -U myuser -c "CREATE DATABASE mydatabase;"
+  script:
+    - gradle test --info
+  artifacts:
+    paths:
+      - build/test-results/
+      - build/reports/
+    when: always
+  cache:
+    paths:
+      - .gradle/
